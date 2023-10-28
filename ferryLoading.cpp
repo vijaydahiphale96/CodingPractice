@@ -1,3 +1,16 @@
+/*
+Author - Vijay Dattu Dahiphale
+B-Number - B01036763
+
+How To Execute the Code - 
+Use following commands to compile and run the code - 
+
+g++ ferryLoading.cpp
+./a.out ferry04.txt
+
+*/
+
+
 #include <iostream>
 #include <vector>
 #include <unordered_set>
@@ -5,6 +18,8 @@
 #include <map>
 #include <utility>
 #include <algorithm>
+#include<fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -117,20 +132,50 @@ void maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
 
 
 
-int main() {
-    int n; // Number of cars
-    cin >> n;
-    vector<int> carLengths(n);
+int main(int argc, char *argv[]) {
 
-    // Input car lengths
-    for (int i = 0; i < n; i++) {
-        cin >> carLengths[i];
+    if (argc < 2) { //Show error if the user has not provided input file
+        cout<<"please provide correct arguments \n";
+        exit(1);
     }
 
-    int columnSize; // Length of both columns
-    cin >> columnSize;
+    int noOfCars; // Number of cars
+    int ferryLength; // Length of left and right lines
+    vector<int> carLengths(noOfCars); // Length of each car
 
-    maxCarsAllocation(n, carLengths, columnSize);
+
+    // **********************    Read File Data Starts   **********************
+    ifstream file;
+    string line;
+    string splittedString;
+    string fileName = argv[1];
+
+    file.open(fileName); // Open file
+    if (!file) { // Show error if file does not exit OR error while opening the file
+        cout<<"Could not open "<<fileName;
+        exit(1);
+    }
+
+    try {
+        getline(file, line); // Get single line data into "line" string variable
+        istringstream split(line);
+        getline(split, splittedString, ' '); // splits the 1st line of input file with space (' '), and add 1st part into splittedString string
+        noOfCars = stoi(splittedString); // set noOfCars
+        getline(split, splittedString, ' '); // splits the 1st line of input file with space (' '), and add 2nd part into splittedString string
+        ferryLength = stoi(splittedString); // set ferryLength
+        while (getline(file, line)) {    // Get new one line data into "line" string variable
+            carLengths.push_back(stoi(line)); // add length of each car into carLengths vector
+        }
+    }
+    catch(const std::exception& e) {
+        // Catch error while reading file
+        cout<<"Error while reading input file! Please check input file\n";
+        exit(1);
+    }
+    file.close();
+    // **********************    Read File Data Ends   **********************
+
+    maxCarsAllocation(noOfCars, carLengths, ferryLength);
 
     return 0;
 }
