@@ -26,7 +26,6 @@ struct PairEqual {
 };
 
 int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
-    unordered_set<std::pair<int, int>, PairHash, PairEqual> calculatedMatrixPoints;
     vector<vector<vector<int> > > dp(n+1);
     vector<int> v1;
     v1.push_back(0);
@@ -35,6 +34,8 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
     for (int i = 1; i <= n; i++) {
         int carLength = carLengths[i - 1];
         int inner = dp[i-1].size();
+        int count = 0;
+        unordered_set<std::pair<int, int>, PairHash, PairEqual> calculatedMatrixPoints;
         for (int j = 0; j < inner; j++) {
             int leftLineSize = dp[i-1][j][0];
             int rightLineSize = dp[i-1][j][1];
@@ -47,6 +48,7 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
                     v2.push_back(leftLineSize + carLength);
                     v2.push_back(rightLineSize);
                     dp[i].push_back(v2);
+                    count++;
                 }
             }
 
@@ -58,12 +60,12 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
                     v2.push_back(leftLineSize);
                     v2.push_back(rightLineSize + carLength);
                     dp[i].push_back(v2);
+                    count++;
                 }
             }
-            
-            if(carLength > (ferryLength - leftLineSize) && carLength > (ferryLength - rightLineSize)) {
-                return i-1;
-            }
+        }
+        if(count == 0) {
+            return i-1;
         }
     }
 
