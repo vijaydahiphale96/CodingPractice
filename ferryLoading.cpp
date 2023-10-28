@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <unordered_set>
+#include <string>
+#include <map>
 #include <utility>
 #include <algorithm>
 
@@ -25,29 +27,71 @@ struct PairEqual {
     }
 };
 
+class Ferry {
+  public:
+    int leftLength;
+    int rightLength;
+    int prevIndexI;
+    int prevIndexJ;
+    string place;
+
+    Ferry(int left, int right, int i, int j, const string& p) {
+        leftLength = left;
+        rightLength = right;
+        prevIndexI = i;
+        prevIndexJ = j;
+        place = p;
+    }
+};
+
+void showData(int allocatedCars, vector<int>& carLengths, vector<vector<Ferry> >& dp) {
+
+    // for (int i = 0; i <= allocatedCars; ++i) {
+    //     for (int j = 0; j < dp[i].size(); ++j) {
+    //         cout<<"i="<<i<<" j="<<j<< " k=("<<dp[i][j].leftLength<<","<<dp[i][j].rightLength<<") Place= "<<dp[i][j].place<<" PrevInd= ("<<dp[i][j].prevIndexI<<","<<dp[i][j].prevIndexJ<<")"<<endl;
+    //     }
+    // }
+
+    int carsAllocated = allocatedCars;
+    cout<<"Cars Allocated Count:- "<<carsAllocated<<endl;
+    map<int, string> carsData;
+    int prevIndexJ = 0;
+    int prevIndexI = carsAllocated;
+    while(carsAllocated>0) {
+        // cout<<"prevIndexI= "<<prevIndexI<<" prevIndexJ= "<<prevIndexJ<<endl;
+        carsData.insert(make_pair(carsAllocated, dp[prevIndexI][prevIndexJ].place));
+        carsAllocated--;
+        int tempPrevIndexI = prevIndexI;
+        prevIndexI = dp[prevIndexI][prevIndexJ].prevIndexI;
+        prevIndexJ = dp[tempPrevIndexI][prevIndexJ].prevIndexJ;
+    }
+
+    for(int i = 1; i<=carsData.size(); i++) {
+        cout<<"Car number:- "<< i << "   Car Length:- " << carLengths[i-1] << "   Place:- " << carsData[i]<<endl;
+    }
+
+}
+
 int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
-    vector<vector<vector<int> > > dp(n+1);
-    vector<int> v1;
-    v1.push_back(0);
-    v1.push_back(0);
-    dp[0].push_back(v1);
+    vector<vector<Ferry> > dp(n+1);
+    Ferry obj1(0, 0, -1, -1, "");
+    dp[0].push_back(obj1);
     for (int i = 1; i <= n; i++) {
         int carLength = carLengths[i - 1];
         int inner = dp[i-1].size();
         int count = 0;
         unordered_set<std::pair<int, int>, PairHash, PairEqual> calculatedMatrixPoints;
         for (int j = 0; j < inner; j++) {
-            int leftLineSize = dp[i-1][j][0];
-            int rightLineSize = dp[i-1][j][1];
+            int leftLineSize = dp[i-1][j].leftLength;
+            int rightLineSize = dp[i-1][j].rightLength;
 
             if(carLength <= (ferryLength - leftLineSize)) {
                 pair<int, int> myPair(leftLineSize + carLength, rightLineSize);
                 if(calculatedMatrixPoints.find(myPair) == calculatedMatrixPoints.end()) {
                     calculatedMatrixPoints.insert(myPair);
-                    vector<int> v2;
-                    v2.push_back(leftLineSize + carLength);
-                    v2.push_back(rightLineSize);
-                    dp[i].push_back(v2);
+                    Ferry obj2(leftLineSize + carLength, rightLineSize, i-1, j, "left");
+                    dp[i].push_back(obj2);
+                    // cout<<"i="<<i<<" j="<<j<< " k=("<<leftLineSize + carLength<<","<<rightLineSize<<") Place= left"<<endl;
                     count++;
                 }
             }
@@ -56,26 +100,25 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
                 pair<int, int> myPair(leftLineSize, rightLineSize + carLength);
                 if(calculatedMatrixPoints.find(myPair) == calculatedMatrixPoints.end()) {
                     calculatedMatrixPoints.insert(myPair);
-                    vector<int> v2;
-                    v2.push_back(leftLineSize);
-                    v2.push_back(rightLineSize + carLength);
-                    dp[i].push_back(v2);
+                    Ferry obj2(leftLineSize, rightLineSize + carLength, i-1, j, "right");
+                    dp[i].push_back(obj2);
+                    // cout<<"i="<<i<<" j="<<j<< " k=("<<leftLineSize<<","<<rightLineSize + carLength<<") Place= right"<<endl;
                     count++;
                 }
             }
         }
         if(count == 0) {
+            showData(i-1, carLengths, dp);
             return i-1;
         }
     }
 
-    for (int i = 0; i <= n; ++i) {
-        for (int j = 0; j < dp[i].size(); ++j) {
-            cout<<"i="<<i<<" j="<<j<< " k=("<<dp[i][j][0]<<","<<dp[i][j][1]<<")"<<endl;
-        }
-    }
+    showData(n, carLengths, dp);
+
     return n;
 }
+
+
 
 int main() {
     int n; // Number of cars
@@ -91,7 +134,6 @@ int main() {
     cin >> columnSize;
 
     int maxCars = maxCarsAllocation(n, carLengths, columnSize);
-    cout << "Maximum number of cars that can be put into the columns: " << maxCars << endl;
 
     return 0;
 }
