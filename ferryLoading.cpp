@@ -8,7 +8,7 @@
 
 using namespace std;
 
-// Custom hash function for std::pair<int, int>
+// Custom hash function for pair<int, int>
 struct PairHash {
     template <class T1, class T2>
     size_t operator () (const pair<T1, T2>& p) const {
@@ -18,7 +18,7 @@ struct PairHash {
     }
 };
 
-// Custom equality comparison for std::pair<int, int>
+// Custom equality comparison for pair<int, int>
 struct PairEqual {
     template <class T1, class T2>
     bool operator () (const pair<T1, T2>& p1, const pair<T1, T2>& p2) const {
@@ -58,7 +58,6 @@ void showData(int allocatedCars, vector<int>& carLengths, vector<vector<Ferry> >
     int prevIndexJ = 0;
     int prevIndexI = carsAllocated;
     while(carsAllocated>0) {
-        // cout<<"prevIndexI= "<<prevIndexI<<" prevIndexJ= "<<prevIndexJ<<endl;
         carsData.insert(make_pair(carsAllocated, dp[prevIndexI][prevIndexJ].place));
         carsAllocated--;
         int tempPrevIndexI = prevIndexI;
@@ -72,7 +71,7 @@ void showData(int allocatedCars, vector<int>& carLengths, vector<vector<Ferry> >
 
 }
 
-int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
+void maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
     vector<vector<Ferry> > dp(n+1);
     Ferry obj1(0, 0, -1, -1, "");
     dp[0].push_back(obj1);
@@ -91,7 +90,6 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
                     calculatedMatrixPoints.insert(myPair);
                     Ferry obj2(leftLineSize + carLength, rightLineSize, i-1, j, "left");
                     dp[i].push_back(obj2);
-                    // cout<<"i="<<i<<" j="<<j<< " k=("<<leftLineSize + carLength<<","<<rightLineSize<<") Place= left"<<endl;
                     count++;
                 }
             }
@@ -102,20 +100,19 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
                     calculatedMatrixPoints.insert(myPair);
                     Ferry obj2(leftLineSize, rightLineSize + carLength, i-1, j, "right");
                     dp[i].push_back(obj2);
-                    // cout<<"i="<<i<<" j="<<j<< " k=("<<leftLineSize<<","<<rightLineSize + carLength<<") Place= right"<<endl;
                     count++;
                 }
             }
         }
         if(count == 0) {
             showData(i-1, carLengths, dp);
-            return i-1;
+            return ;
         }
     }
 
     showData(n, carLengths, dp);
 
-    return n;
+    return ;
 }
 
 
@@ -133,7 +130,7 @@ int main() {
     int columnSize; // Length of both columns
     cin >> columnSize;
 
-    int maxCars = maxCarsAllocation(n, carLengths, columnSize);
+    maxCarsAllocation(n, carLengths, columnSize);
 
     return 0;
 }
