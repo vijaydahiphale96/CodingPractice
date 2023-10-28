@@ -9,9 +9,9 @@ using namespace std;
 // Custom hash function for std::pair<int, int>
 struct PairHash {
     template <class T1, class T2>
-    std::size_t operator () (const std::pair<T1, T2>& p) const {
-        auto h1 = std::hash<T1>{}(p.first);
-        auto h2 = std::hash<T2>{}(p.second);
+    size_t operator () (const pair<T1, T2>& p) const {
+        size_t h1 = hash<T1>()(p.first);
+        size_t h2 = hash<T2>()(p.second);
         return h1 ^ h2;
     }
 };
@@ -19,16 +19,18 @@ struct PairHash {
 // Custom equality comparison for std::pair<int, int>
 struct PairEqual {
     template <class T1, class T2>
-    bool operator () (const std::pair<T1, T2>& p1, const std::pair<T1, T2>& p2) const {
-        return p1.first == p2.first && p1.second == p2.second;
+    bool operator () (const pair<T1, T2>& p1, const pair<T1, T2>& p2) const {
+        bool areEqual = (p1.first == p2.first) && (p1.second == p2.second);
+        return areEqual;
     }
 };
 
 int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
-    // vector<vector<vector<int>> > dp(n + 1, vector<vector<int>>(ferryLength+1, vector<int>(2, 0)));
     unordered_set<std::pair<int, int>, PairHash, PairEqual> calculatedMatrixPoints;
-    vector<vector<vector<int>>> dp(n+1);
-    vector<int> v1 = {0,0};
+    vector<vector<vector<int> > > dp(n+1);
+    vector<int> v1;
+    v1.push_back(0);
+    v1.push_back(0);
     dp[0].push_back(v1);
     for (int i = 1; i <= n; i++) {
         int carLength = carLengths[i - 1];
@@ -41,7 +43,9 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
                 pair<int, int> myPair(leftLineSize + carLength, rightLineSize);
                 if(calculatedMatrixPoints.find(myPair) == calculatedMatrixPoints.end()) {
                     calculatedMatrixPoints.insert(myPair);
-                    vector<int> v2 = {leftLineSize + carLength, rightLineSize};
+                    vector<int> v2;
+                    v2.push_back(leftLineSize + carLength);
+                    v2.push_back(rightLineSize);
                     dp[i].push_back(v2);
                 }
             }
@@ -50,7 +54,9 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
                 pair<int, int> myPair(leftLineSize, rightLineSize + carLength);
                 if(calculatedMatrixPoints.find(myPair) == calculatedMatrixPoints.end()) {
                     calculatedMatrixPoints.insert(myPair);
-                    vector<int> v2 = {leftLineSize, rightLineSize + carLength};
+                    vector<int> v2;
+                    v2.push_back(leftLineSize);
+                    v2.push_back(rightLineSize + carLength);
                     dp[i].push_back(v2);
                 }
             }
@@ -58,8 +64,6 @@ int maxCarsAllocation(int n, vector<int>& carLengths, int ferryLength) {
             if(carLength > (ferryLength - leftLineSize) && carLength > (ferryLength - rightLineSize)) {
                 return i-1;
             }
-            // cout<<"i="<<i<<" j="<<j<< " k=("<<dp[i][j][0]<<","<<dp[i][j][1]<<")"<<endl;
-            // cout<<"i="<<i<<" j="<<j<< " k=("<<dp[i][j+1][0]<<","<<dp[i][j+1][1]<<")"<<endl;
         }
     }
 
