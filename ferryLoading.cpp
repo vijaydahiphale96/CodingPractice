@@ -68,7 +68,7 @@ void showData(int allocatedCars, vector<int>& carLengths, vector<vector<Ferry> >
     // }
 
     int carsAllocated = allocatedCars;
-    cout<<"Cars Allocated Count:- "<<carsAllocated<<endl;
+    cout<<"Cars Allocated Count: "<<carsAllocated<<endl;
     map<int, string> carsData;
     int prevIndexJ = 0;
     int prevIndexI = carsAllocated;
@@ -81,7 +81,7 @@ void showData(int allocatedCars, vector<int>& carLengths, vector<vector<Ferry> >
     }
 
     for(int i = 1; i<=carsData.size(); i++) {
-        cout<<"Car number:- "<< i << "   Car Length:- " << carLengths[i-1] << "   Place:- " << carsData[i]<<endl;
+        cout<<"Car number: "<< i << "   Car Length: " << carLengths[i-1] << "   Place: " << carsData[i]<<endl;
     }
 
 }
